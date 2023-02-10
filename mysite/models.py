@@ -22,7 +22,7 @@ class Product(models.Model):
     class Meta:
         verbose_name = 'Product'
         verbose_name_plural = 'Products'
-        ordering = ('name',)
+        ordering = ['name']
 
 
     def __str__(self):
@@ -39,10 +39,13 @@ class Purchase(models.Model):
     class Meta:
         verbose_name = 'Purchase'
         verbose_name_plural = 'Purchases'
-        ordering = ('created', )
+        ordering = ['-created']
 
     def __str__(self):
-        return f'{self.product} | {self.quantity}'
+        return f"{self.product}"
+
+    def total(self):
+        return self.product.price * self.quantity
 
 
 class Return(models.Model):
@@ -50,15 +53,7 @@ class Return(models.Model):
     created = models.DateTimeField(default=timezone.now)
 
     class Meta:
-        verbose_name = 'Return'
-        verbose_name_plural = 'Returns'
-
+        ordering = ['created']
 
     def __str__(self):
         return f'{self.delete}'
-
-
-
-
-
-

@@ -1,7 +1,18 @@
 {% extends 'main.html' %}
 {% block content %}
     <h1>Welcome!!!</h1>
-    <div>
+{#    {% for obj in object_list %}#}
+{#        <div>#}
+{#            <ul>#}
+{#                <li>name: {{ obj.name }}</li>#}
+{#                <li>description: {{ obj.description }}</li>#}
+{#                <li>quantity: {{ obj.quantity }}</li>#}
+{#                <li>price: {{ obj.price }}</li>#}
+{#                <li>image: {{ obj.image }}</li>#}
+{#            </ul>#}
+{#        </div>#}
+{#    {% endfor %}#}
+{#    <div>#}
         {% if user.is_authenticated %}
             <li>Name: {{ user.get_username }}</li>
             <li>wallet: {{ user.wallet }}</li>
@@ -12,7 +23,7 @@
             <h2>If you don't have an account, please register.</h2>
             <a href="{% url 'signup' %}">Sign Up</a>
         {% endif %}
-    </div>
+{#    </div>#}
 
     {#    <a href="{% url 'login' %}">Login</a>#}
 

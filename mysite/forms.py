@@ -1,6 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from mysite.models import MyUser
+from mysite.models import MyUser, Purchase, Return
 from django.contrib.auth.forms import UserCreationForm
 
 
@@ -21,4 +21,13 @@ class UserRegisterForm(UserCreationForm):
             raise ValidationError('User with this name is already registered')
 
 
+class PurchaseCreateForm(forms.ModelForm):
+    class Meta:
+        model = Purchase
+        fields = ['quantity']
 
+
+class ReturnCreateForm(forms.ModelForm):
+    class Meta:
+        model = Return
+        fields = ['delete']

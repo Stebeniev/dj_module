@@ -1,0 +1,12 @@
+{% extends 'main.html' %}
+{% block content %}
+{% for obj in object_list %}
+    {{ purchase.quantity }}
+	<form method="post" action="{% url 'purchase_create' obj.pk %}">
+		{% csrf_token %}
+{#		{{ create_form }}#}
+{#		<input type="hidden" name="purchases_return" value="{{purchase.pk}}">#}
+		<input type="submit" value="Вернуть" >
+	</form>
+{% endfor %}
+{% endblock %}
