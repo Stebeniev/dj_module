@@ -44,7 +44,7 @@ class Purchase(models.Model):
     def __str__(self):
         return f"{self.product}"
 
-    def total(self):
+    def sum(self):
         return self.product.price * self.quantity
 
 
