@@ -1,6 +1,7 @@
 {% extends 'main.html' %}
 {% block content %}
     <h1>Welcome!!!</h1>
+
 {#    {% for obj in object_list %}#}
 {#        <div>#}
 {#            <ul>#}
@@ -13,6 +14,8 @@
 {#        </div>#}
 {#    {% endfor %}#}
 {#    <div>#}
+{#    {% if user.is_superuser %}#}
+
         {% if user.is_authenticated %}
             <li>Name: {{ user.get_username }}</li>
             <li>wallet: {{ user.wallet }}</li>

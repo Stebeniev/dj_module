@@ -1,12 +1,20 @@
 {% extends 'main.html' %}
 {% block content %}
-{% for obj in object_list %}
-    {{ purchase.quantity }}
-	<form method="post" action="{% url 'purchase_create' obj.pk %}">
-		{% csrf_token %}
-{#		{{ create_form }}#}
-{#		<input type="hidden" name="purchases_return" value="{{purchase.pk}}">#}
-		<input type="submit" value="Вернуть" >
-	</form>
-{% endfor %}
+    <h1>Purchase</h1>
+    <div class="purchase">
+        <ul>
+            {% for purchase in object_list %}
+                <li>
+                    {{ purchase.quantity }} * {{ purchase.product.name }}
+                    <span>-{{ purchase.sum }}$</span>
+                </li>
+            {% endfor %}
+        </ul>
+        <p>Total:${{ purchase.get_total_sum }}</p>
+    </div>
+    <form method="post" action="{% url 'purchase' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Return</button>
+    </form>
 {% endblock %}
