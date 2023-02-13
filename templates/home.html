@@ -1,34 +1,39 @@
 {% extends 'main.html' %}
 {% block content %}
-    <h1>Welcome!!!</h1>
-
-{#    {% for obj in object_list %}#}
-{#        <div>#}
-{#            <ul>#}
-{#                <li>name: {{ obj.name }}</li>#}
-{#                <li>description: {{ obj.description }}</li>#}
-{#                <li>quantity: {{ obj.quantity }}</li>#}
-{#                <li>price: {{ obj.price }}</li>#}
-{#                <li>image: {{ obj.image }}</li>#}
-{#            </ul>#}
-{#        </div>#}
-{#    {% endfor %}#}
-{#    <div>#}
-{#    {% if user.is_superuser %}#}
-
-        {% if user.is_authenticated %}
-            <li>Name: {{ user.get_username }}</li>
-            <li>wallet: {{ user.wallet }}</li>
-            <br>
-            <a href="{% url 'logout' %}">Logout</a>
-        {% else %}
-            <a href="{% url 'login' %}">Login</a>
-            <h2>If you don't have an account, please register.</h2>
-            <a href="{% url 'signup' %}">Sign Up</a>
-        {% endif %}
-{#    </div>#}
-
-    {#    <a href="{% url 'login' %}">Login</a>#}
-
-
+    {% for product in object_list %}
+        <div class="container">
+            <div class="info" style="width: 25rem;">
+                <img src="{{ product.image_url }}" class="info-img-top" alt="Just image">
+                <div class="name">
+                    <h3 class="name"><b>Product: {{ product.name }}</b></h3>
+                    <p class="description">
+                        Description: {{ product.description|linebreaksbr }}
+                    </p>
+                </div>
+                <ul class="list-group">
+                    <li class="list-group">Price: {{ product.price }}</li>
+                    <li class="list-group">
+                        <label class="form-label" for="id_quantity">Quantity:</label>
+                        <label>
+                            <input type="number" name="quantity" value="1" min="1"
+                                   required id="quantity_id"/>
+                        </label>
+                    </li>
+                </ul>
+                {% if user.is_authenticated %}
+                    {% if  not user.is_superuser %}
+                        <form method="post" action="{% url 'purchase_create' product.id %}">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <button type="submit"><span>Buy now</span></button
+                    {% else %}
+                            <li>
+                                <a href="{% url 'update_product' product.id %}">Update</a>
+                            </li>
+                        </form>
+            </div>
+        </div>
+                    {% endif %}
+                {% endif %}
+    {% endfor %}
 {% endblock %}
