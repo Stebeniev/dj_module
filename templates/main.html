@@ -12,8 +12,64 @@
     </style>
     <title></title>
 </head>
+<h1>Welcome to our online store!!!</h1>
 <body>
-    {% block content %}
-    {% endblock %}
+{% if messages %}
+    {% for message in messages %}
+        <h2 style="color: green;">{{ message|safe }}</h2>
+    {% endfor %}
+{% endif %}
+{#<ul>#}
+{#    <li>#}
+        {#        <a href="{% url 'home' %}">Back to Main page.</a>#}
+{#    </li>#}
+{#</ul>#}
+
+{% if not user.is_authenticated %}
+    <ul>
+        <li>
+            <a href="{% url 'login' %}">Login</a>
+        </li>
+        <li>
+            <a href="{% url 'signup' %}">Sign Up</a>
+        </li>
+    </ul>
+{% else %}
+    {% if user.is_superuser %}
+        <ul>
+            <li>
+                <a href="{% url 'home' %}">Back to Main page.</a>
+            </li>
+            <li>
+                <a href="{% url 'new_product' %}">Add New Product</a>
+            </li>
+            {#        <a href="{% url 'update_product' product_id %}">Update Product</a>#}
+            <li>
+                <a href="{% url 'purchase' %}">Purchase</a>
+            </li>
+            {#        <a href="{% url 'returns' %}">All Returns</a>#}
+            <li>
+                <a href="{% url 'logout' %}">Logout</a>
+            </li>
+        </ul>
+    {% else %}
+        <ul>
+            <li>
+                {#        <a href="{% url 'purchases' %}">My Purchases</a>#}
+            </li>
+            <li>
+                {#        <a href="{% url 'returns' %}">My Returns</a>#}
+            </li>
+            <li>
+                <a href="{% url 'logout' %}">Logout</a>
+            </li>
+        </ul>
+
+        <p>Name: {{ user.get_username }}</p>
+        <p>Wallet: {{ user.wallet }}</p>
+    {% endif %}
+{% endif %}
 </body>
+{% block content %}
+{% endblock %}
 </html>
