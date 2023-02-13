@@ -25,7 +25,7 @@
                         <form method="post" action="{% url 'purchase_create' product.id %}">
                             {% csrf_token %}
                             {{ form.as_p }}
-                            <button type="submit"><span>Buy now</span></button
+                            <button type="submit"><span>Buy now</span></button>
                     {% else %}
                             <li>
                                 <a href="{% url 'update_product' product.id %}">Update</a>
