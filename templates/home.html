@@ -2,10 +2,11 @@
 {% block content %}
     {% for product in object_list %}
         <div class="container">
-            <div class="info" style="width: 25rem;">
-                <img src="{{ product.image_url }}" class="info-img-top" alt="Just image">
-                <div class="name">
-                    <h3 class="name"><b>Product: {{ product.name }}</b></h3>
+            <div class="name">
+                <h3 class="name"><b>Product: {{ product.name }}</b></h3>
+                <div class="image" style="width: 25rem;">
+                    <img src="media/{{ product.image }}" class="info-img-top"
+                         style="width: 300px; height: 300px" alt="product_img">
                     <p class="description">
                         Description: {{ product.description|linebreaksbr }}
                     </p>
@@ -25,13 +26,14 @@
                         <form method="post" action="{% url 'purchase_create' product.id %}">
                             {% csrf_token %}
                             {{ form.as_p }}
-                            <button type="submit"><span>Buy now</span></button>
-                    {% else %}
+                            <button type="submit" style="background-color: royalblue; width: 100px">
+                                <span>Buy now</span></button>
+                            {% else %}
                             <li>
                                 <a href="{% url 'update_product' product.id %}">Update</a>
                             </li>
                         </form>
-            </div>
+             </div>
         </div>
                     {% endif %}
                 {% endif %}

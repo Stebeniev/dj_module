@@ -16,7 +16,7 @@
 <body>
 {% if messages %}
     {% for message in messages %}
-        <h2 style="color: green;">{{ message|safe }}</h2>
+        <h3 style="color: red;">{{ message }}</h3>
     {% endfor %}
 {% endif %}
 {#<ul>#}
@@ -65,8 +65,9 @@
             </li>
         </ul>
 
-        <p>Name: {{ user.get_username }}</p>
-        <p>Wallet: {{ user.wallet }}</p>
+        Nickname: {{ user.get_username }}
+        <br>
+        Wallet: {{ user.wallet }}
     {% endif %}
 {% endif %}
 </body>
