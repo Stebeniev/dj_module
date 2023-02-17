@@ -16,12 +16,14 @@
 <body>
 {% if messages %}
     {% for message in messages %}
-        <h3 style="color: red;">{{ message }}</h3>
+        {% if message.tags == 'error' %}
+            <div><span>{{ message }}</span></div>
+        {% endif %}
     {% endfor %}
 {% endif %}
 {#<ul>#}
 {#    <li>#}
-        {#        <a href="{% url 'home' %}">Back to Main page.</a>#}
+{#        <a href="{% url 'home' %}">Back to Main page.</a>#}
 {#    </li>#}
 {#</ul>#}
 
@@ -45,9 +47,11 @@
             </li>
             {#        <a href="{% url 'update_product' product_id %}">Update Product</a>#}
             <li>
-                <a href="{% url 'purchase' %}">Purchase</a>
+                <a href="{% url 'purchase' %}">Purchases</a>
             </li>
-            {#        <a href="{% url 'returns' %}">All Returns</a>#}
+            <li>
+                <a href="{% url 'return' %}">Returns</a>
+            </li>
             <li>
                 <a href="{% url 'logout' %}">Logout</a>
             </li>
@@ -55,16 +59,18 @@
     {% else %}
         <ul>
             <li>
-                {#        <a href="{% url 'purchases' %}">My Purchases</a>#}
+                <a href="{% url 'home' %}">Back to Main page.</a>
             </li>
             <li>
-                {#        <a href="{% url 'returns' %}">My Returns</a>#}
+                <a href="{% url 'purchase' %}">Purchase</a>
+            </li>
+            <li>
+                <a href="{% url 'return' %}">Return</a>
             </li>
             <li>
                 <a href="{% url 'logout' %}">Logout</a>
             </li>
         </ul>
-
         Nickname: {{ user.get_username }}
         <br>
         Wallet: {{ user.wallet }}

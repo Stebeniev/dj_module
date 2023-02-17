@@ -13,7 +13,7 @@ class UserRegisterForm(UserCreationForm):
 
     class Meta:
         model = MyUser
-        fields = '__all__'
+        fields = ('username', 'password1', 'password2', 'wallet')
 
     def clean(self):
         username = self.cleaned_data.get('username')
@@ -22,12 +22,16 @@ class UserRegisterForm(UserCreationForm):
 
 
 class PurchaseCreateForm(forms.ModelForm):
+    quantity = forms.IntegerField(initial=1, widget=forms.NumberInput(attrs={'min': 1}))
+
     class Meta:
         model = Purchase
         fields = ['quantity']
 
 
 class ReturnCreateForm(forms.ModelForm):
+    purchase = forms.ModelChoiceField(queryset=Purchase.objects.all(), required=False)
+
     class Meta:
         model = Return
-        fields = ['delete']
+        fields = ['purchase']

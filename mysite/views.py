@@ -1,20 +1,21 @@
-from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
-from django.shortcuts import render, redirect
+from django.http import HttpResponseRedirect
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from django.views.generic import ListView, CreateView, UpdateView
-from django.contrib import messages
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 
-from mysite.forms import UserRegisterForm, PurchaseCreateForm
-from mysite.models import Product, Purchase, MyUser
+from mysite.forms import UserRegisterForm, PurchaseCreateForm, ReturnCreateForm
+from mysite.models import Product, Purchase, MyUser, Return
 
 
 class ProductView(ListView):
     model = Product
     template_name = 'home.html'
     context_object_name = "products"
+    paginate_by = 4  ### добавить пагинацию на главную страницу###
 
 
 class Register(CreateView):
@@ -53,8 +54,7 @@ class PurchaseListView(LoginRequiredMixin, ListView):
     login_url = 'login'
     model = Purchase
     template_name = 'purchase.html'
-    # extra_context = {'form': PurchaseCreateForm}
-    # extra_context = {'create_form': PurchaseCreateForm()}
+    extra_context = {'form': PurchaseCreateForm}
 
     def get_queryset(self):
         if not self.request.user.is_superuser:
@@ -64,23 +64,74 @@ class PurchaseListView(LoginRequiredMixin, ListView):
         return queryset
 
 
-class PurchasesCreateView(LoginRequiredMixin, CreateView):
+class PurchaseCreateView(LoginRequiredMixin, CreateView):
     login_url = 'login'
-    model = Purchase
-    form_class = PurchaseCreateForm
     template_name = 'home.html'
-    success_url = reverse_lazy('purchases')
+    form_class = PurchaseCreateForm
+    success_url = reverse_lazy('purchase')
 
     def form_valid(self, form):
         object = form.save(commit=False)
         object.user = self.request.user
-        product = Product.objects.get(id=self.request.POST['product_pk'])
+        product_id = self.kwargs.get('pk')
+        product = Product.objects.get(id=product_id)
         object.product = product
-        object.save()
+        purchase_total = object.quantity * product.price
+        if object.quantity > product.quantity:
+            messages.error(self.request, "Insufficient quantity of goods in stock")
+            return redirect('/')
+        elif self.request.user.wallet < purchase_total:
+            messages.error(self.request, "You don't have enough money to complete the purchase")
+            return redirect('/')
+        else:
+            product.quantity = product.quantity - object.quantity
+            product.save()
+            user = MyUser.objects.get(username=self.request.user)
+            user.wallet -= purchase_total
+            user.save()
         return super().form_valid(form=form)
 
 
+class ReturnCreateView(LoginRequiredMixin, CreateView):
+    login_url = 'login/'
+    form_class = ReturnCreateForm
+    template_name = 'purchase.html'
+    success_url = reverse_lazy('return')
+
+    # def form_valid(self, form):
+    #     object = form.save(commit=False)
+    #     purchase_id = self.kwargs.get('pk')
+    #     purchase = Purchase.objects.get(id=purchase_id)    ###доделать тайминг возврата- вывод сообщения###
 
 
+class ReturnListView(LoginRequiredMixin, ListView):
+    login_url = 'login/'
+    model = Return
+    template_name = 'return_product.html'
+    extra_context = {'form': ReturnCreateForm}
+    paginate_by = 4
+
+    def get_queryset(self):
+        if not self.request.user.is_superuser:
+            queryset = Return.objects.filter(user=self.request.user)
+            return queryset
+        queryset = Return.objects.all()
+        return queryset
 
 
+class DeleteReturnView(LoginRequiredMixin, DeleteView):
+    model = Purchase
+    success_url = reverse_lazy('return')
+
+    def form_valid(self, form):
+        purchase = self.get_object()
+        user = purchase.user
+        product = purchase.product
+        user.wallet += purchase.purchase_total
+        product.quantity += purchase.quantity
+        return HttpResponseRedirect(self.success_url)
+
+
+class DeleteView(LoginRequiredMixin, DeleteView):
+    model = Return
+    success_url = reverse_lazy('return')

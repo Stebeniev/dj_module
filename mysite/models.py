@@ -4,7 +4,7 @@ from django.utils import timezone
 
 
 class MyUser(AbstractUser):
-    wallet = models.IntegerField(blank=True, null=True, verbose_name='wallet')
+    wallet = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
 
     class Meta:
         verbose_name = 'MyUser'
@@ -44,16 +44,16 @@ class Purchase(models.Model):
     def __str__(self):
         return f"{self.product}"
 
-    def sum(self):
+    def purchase_total(self):
         return self.product.price * self.quantity
 
 
 class Return(models.Model):
     delete = models.OneToOneField(Purchase, on_delete=models.CASCADE)
-    created = models.DateTimeField(default=timezone.now)
+    created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['created']
+        ordering = ['-created']
 
     def __str__(self):
         return f'{self.delete}'
