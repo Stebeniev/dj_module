@@ -119,7 +119,7 @@ class ReturnListView(LoginRequiredMixin, ListView):
         return queryset
 
 
-class DeleteReturnView(LoginRequiredMixin, DeleteView):
+class DeletePurchaseView(LoginRequiredMixin, DeleteView):
     model = Purchase
     success_url = reverse_lazy('return')
 
@@ -132,6 +132,6 @@ class DeleteReturnView(LoginRequiredMixin, DeleteView):
         return HttpResponseRedirect(self.success_url)
 
 
-class DeleteView(LoginRequiredMixin, DeleteView):
+class DeleteReturnView(LoginRequiredMixin, DeleteView):
     model = Return
     success_url = reverse_lazy('return')
