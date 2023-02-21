@@ -9,7 +9,7 @@ class MyUser(AbstractUser):
     class Meta:
         verbose_name = 'MyUser'
         verbose_name_plural = 'MyUsers'
-        ordering = ('username', )
+        # ordering = ('username', )
 
 
 class Product(models.Model):
@@ -49,11 +49,11 @@ class Purchase(models.Model):
 
 
 class Return(models.Model):
-    delete = models.OneToOneField(Purchase, on_delete=models.CASCADE)
+    purchase = models.OneToOneField(Purchase, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['-created']
 
     def __str__(self):
-        return f'{self.delete}'
+        return f'{self.purchase}'

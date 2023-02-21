@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
+
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
@@ -20,13 +21,13 @@ class ProductView(ListView):
 
 class Register(CreateView):
     form_class = UserRegisterForm
-    template_name = 'signup.html'
+    template_name = 'registration_form/signup.html'
     success_url = reverse_lazy('home')
 
 
 class Login(LoginView):
     form_class = AuthenticationForm
-    template_name = 'login.html'
+    template_name = 'registration_form/login.html'
 
     def get_success_url(self):
         return reverse_lazy('home')
@@ -54,7 +55,7 @@ class PurchaseListView(LoginRequiredMixin, ListView):
     login_url = 'login'
     model = Purchase
     template_name = 'purchase.html'
-    extra_context = {'form': PurchaseCreateForm}
+    extra_context = {'form': ReturnCreateForm}
 
     def get_queryset(self):
         if not self.request.user.is_superuser:
@@ -91,6 +92,53 @@ class PurchaseCreateView(LoginRequiredMixin, CreateView):
             user.save()
         return super().form_valid(form=form)
 
+    # def form_valid(self, form):
+        # user = self.request.user
+        # product_id = self.kwargs.get('pk')
+        # product = Product.objects.get(id=product_id)
+        # quantity = int(self.request.POST['quantity'])
+        # price = product.price
+        # purchase = product.quantity
+        # wallet = user.wallet
+        # purchase_total = quantity * price
+        #
+        # if wallet < purchase_total:
+        #     messages.error(self.request, "You don't have enough money to complete the purchase")
+        #     return redirect('/')
+        # if purchase < quantity:
+        #     messages.error(self.request, "Insufficient quantity of goods in stock")
+        #     return redirect('/')
+        #
+        # user.wallet -= purchase_total
+        # product.quantity -= quantity
+        # product = Product.objects.get(id=product_id)
+        #
+        # with transaction.atomic():
+        #     user.save()
+        #     product.save()
+        #     purchase.save()
+        # return super().form_valid(form)
+        #
+        # object = form.save(commit=False)
+        # user = self.request.user
+        # product_id = self.kwargs.get('pk')
+        # product = Product.objects.get(id=product_id)
+        # object.product = product
+        # purchase_total = object.quantity * product.price
+        # if object.quantity > product.quantity:
+        #     messages.error(self.request, "Insufficient quantity of goods in stock")
+        #     return redirect('/')
+        # elif user.wallet < purchase_total:
+        #     messages.error(self.request, "You don't have enough money to complete the purchase")
+        #     return redirect('/')
+        # else:
+        #     product.quantity = product.quantity - object.quantity
+        #     product.save()
+        #     user = MyUser.objects.get(username=self.request.user)
+        #     user.wallet -= purchase_total
+        #     user.save()
+        #     return super().form_valid(form=form)
+
 
 class ReturnCreateView(LoginRequiredMixin, CreateView):
     login_url = 'login/'
@@ -113,7 +161,7 @@ class ReturnListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         if not self.request.user.is_superuser:
-            queryset = Return.objects.filter(user=self.request.user)
+            queryset = Return.objects.filter(purchase__user=self.request.user)
             return queryset
         queryset = Return.objects.all()
         return queryset
