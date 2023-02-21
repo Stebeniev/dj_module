@@ -1,0 +1,26 @@
+{% extends 'main.html' %}
+{% block content %}
+    <h1>Purchase</h1>
+    <div class="purchase">
+        <ul>
+            {% for purchase in object_list %}
+                <li>
+                Product: {{ purchase.product.name }}
+                <br>
+                Quantity: {{ purchase.quantity }}
+                <br>
+                Price: {{ purchase.product.price }}
+                <br>
+                <h3>Total: {{ purchase.purchase_total }} </h3>
+{#                {% if user.is_superuser %}#}
+                <form method="post" action="{% url 'return_product' purchase.id %}">
+                    {% csrf_token %}
+                    {{ form }}
+                    <button type="submit">Return</button>
+                </form>
+{#                    {% endif %}#}
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
+

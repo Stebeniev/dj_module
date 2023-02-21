@@ -1,0 +1,43 @@
+{% extends 'main.html' %}
+{% block content %}
+    {% for product in object_list %}
+        <div class="container">
+            <div class="name">
+                <h3 class="name"><b>Product: {{ product.name }}</b></h3>
+                <div class="image" style="width: 25rem;">
+                    <img src="media/{{ product.image }}" class="info-img-top"
+                         style="width: 300px; height: 300px" alt="product_img">
+                    <p class="description">
+                        Description: {{ product.description|linebreaksbr }}
+                    </p>
+                </div>
+                <ul class="info">
+                    <li>Price: {{ product.price }}</li>
+                    <li>Quantity:
+{#                        <label class="form-label" for="id_quantity">Quantity:</label>#}
+{#                        <label>#}
+                            <input type="number" name="quantity" value="1"
+                                   min="1" max="{{ product.quantity }}">
+{#                                   required id="quantity_id"/>#}
+
+{#                        </label>#}
+                    </li>
+                </ul>
+                {% if user.is_authenticated %}
+                    {% if  not user.is_superuser %}
+                        <form method="post" action="{% url 'purchase_create' product.id %}">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <button type="submit" style="background-color: royalblue; width: 100px">
+                                <span>Buy now</span></button>
+                            {% else %}
+                            <li>
+                                <a href="{% url 'update_product' product.id %}">Update</a>
+                            </li>
+                        </form>
+             </div>
+        </div>
+                    {% endif %}
+                {% endif %}
+    {% endfor %}
+{% endblock %}

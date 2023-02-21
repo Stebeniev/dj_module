@@ -4,12 +4,12 @@ from django.utils import timezone
 
 
 class MyUser(AbstractUser):
-    wallet = models.IntegerField(blank=True, null=True, verbose_name='wallet')
+    wallet = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
 
     class Meta:
         verbose_name = 'MyUser'
         verbose_name_plural = 'MyUsers'
-        ordering = ('username', )
+        # ordering = ('username', )
 
 
 class Product(models.Model):
@@ -22,7 +22,7 @@ class Product(models.Model):
     class Meta:
         verbose_name = 'Product'
         verbose_name_plural = 'Products'
-        ordering = ('name',)
+        ordering = ['name']
 
 
     def __str__(self):
@@ -39,26 +39,21 @@ class Purchase(models.Model):
     class Meta:
         verbose_name = 'Purchase'
         verbose_name_plural = 'Purchases'
-        ordering = ('created', )
+        ordering = ['-created']
 
     def __str__(self):
-        return f'{self.product} | {self.quantity}'
+        return f"{self.product}"
+
+    def purchase_total(self):
+        return self.product.price * self.quantity
 
 
 class Return(models.Model):
-    delete = models.OneToOneField(Purchase, on_delete=models.CASCADE)
-    created = models.DateTimeField(default=timezone.now)
+    purchase = models.OneToOneField(Purchase, on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        verbose_name = 'Return'
-        verbose_name_plural = 'Returns'
-
+        ordering = ['-created']
 
     def __str__(self):
-        return f'{self.delete}'
-
-
-
-
-
-
+        return f'{self.purchase}'

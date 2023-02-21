@@ -1,0 +1,41 @@
+{% extends 'main.html' %}
+{% block content %}
+    <h1>Return product</h1>
+    {% for return in object_list %}
+        <li>
+            Product: {{ return.purchase.product.name }}
+        </li>
+        <li>
+            Quantity: {{ return.purchase.quantity }}
+        </li>
+        <li>
+            Username: {{ return.purchase.user }}
+        </li>
+        <li>
+            Created: {{ return.purchase.created }}
+        </li>
+        <li>
+            Total: {{ return.purchase.purchase_total }}
+        </li>
+        {% if user.is_superuser %}
+{#                        <form method="post">#}
+{#                        {% csrf_token %}#}
+{#                        {{ form.as_p }}#}
+{#                            <a href="{% url 'delete_return' return.p.pk %}">#}
+{#                                <button type="submit" style="background-color: royalblue">Confirm return</button></a>#}
+{#                            <a href="{% url 'delete_return' return.delete.pk %}">#}
+{#                                <button type="submit" style="background-color: red">Reject return</button></a>#}
+            <form method="post" action="{% url 'delete_return' return.id %}">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" style="background-color: royalblue">Confirm return</button>
+            </form>
+            <form method="post" action="{% url 'delete' return.purchase.id %}">
+                {% csrf_token %}
+{#                {{ form.as_p }}#}
+                <button type="submit" style="background-color: red">Reject return</button>
+            </form>
+        {% endif %}
+    {% endfor %}
+
+{% endblock %}
