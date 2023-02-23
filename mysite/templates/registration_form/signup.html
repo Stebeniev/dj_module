@@ -1,0 +1,12 @@
+{% extends 'home.html' %}
+{% block content %}
+    <ul>
+        <li><a href="{% url 'home' %}">Back to Main page</a></li>
+    </ul>
+    <h2>Create your account.</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" style="color: blue; width: 120px" value="Sign Up">
+    </form>
+{% endblock %}

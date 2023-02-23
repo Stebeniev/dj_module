@@ -1,13 +1,18 @@
+import datetime
+
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
+from django.db import transaction
 
 from django.http import HttpResponseRedirect
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
+from django.utils import timezone
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 
+from django_module.settings import RETURN_TIME
 from mysite.forms import UserRegisterForm, PurchaseCreateForm, ReturnCreateForm
 from mysite.models import Product, Purchase, MyUser, Return
 
@@ -16,7 +21,7 @@ class ProductView(ListView):
     model = Product
     template_name = 'home.html'
     context_object_name = "products"
-    paginate_by = 4  ### добавить пагинацию на главную страницу###
+    paginate_by = 1
 
 
 class Register(CreateView):
@@ -57,6 +62,7 @@ class PurchaseListView(LoginRequiredMixin, ListView):
     template_name = 'purchase.html'
     extra_context = {'form': ReturnCreateForm}
 
+
     def get_queryset(self):
         if not self.request.user.is_superuser:
             queryset = Purchase.objects.filter(user=self.request.user)
@@ -77,6 +83,7 @@ class PurchaseCreateView(LoginRequiredMixin, CreateView):
         product_id = self.kwargs.get('pk')
         product = Product.objects.get(id=product_id)
         object.product = product
+        object.quantity = int(self.request.POST['quantity'])
         purchase_total = object.quantity * product.price
         if object.quantity > product.quantity:
             messages.error(self.request, "Insufficient quantity of goods in stock")
@@ -92,53 +99,6 @@ class PurchaseCreateView(LoginRequiredMixin, CreateView):
             user.save()
         return super().form_valid(form=form)
 
-    # def form_valid(self, form):
-        # user = self.request.user
-        # product_id = self.kwargs.get('pk')
-        # product = Product.objects.get(id=product_id)
-        # quantity = int(self.request.POST['quantity'])
-        # price = product.price
-        # purchase = product.quantity
-        # wallet = user.wallet
-        # purchase_total = quantity * price
-        #
-        # if wallet < purchase_total:
-        #     messages.error(self.request, "You don't have enough money to complete the purchase")
-        #     return redirect('/')
-        # if purchase < quantity:
-        #     messages.error(self.request, "Insufficient quantity of goods in stock")
-        #     return redirect('/')
-        #
-        # user.wallet -= purchase_total
-        # product.quantity -= quantity
-        # product = Product.objects.get(id=product_id)
-        #
-        # with transaction.atomic():
-        #     user.save()
-        #     product.save()
-        #     purchase.save()
-        # return super().form_valid(form)
-        #
-        # object = form.save(commit=False)
-        # user = self.request.user
-        # product_id = self.kwargs.get('pk')
-        # product = Product.objects.get(id=product_id)
-        # object.product = product
-        # purchase_total = object.quantity * product.price
-        # if object.quantity > product.quantity:
-        #     messages.error(self.request, "Insufficient quantity of goods in stock")
-        #     return redirect('/')
-        # elif user.wallet < purchase_total:
-        #     messages.error(self.request, "You don't have enough money to complete the purchase")
-        #     return redirect('/')
-        # else:
-        #     product.quantity = product.quantity - object.quantity
-        #     product.save()
-        #     user = MyUser.objects.get(username=self.request.user)
-        #     user.wallet -= purchase_total
-        #     user.save()
-        #     return super().form_valid(form=form)
-
 
 class ReturnCreateView(LoginRequiredMixin, CreateView):
     login_url = 'login/'
@@ -146,10 +106,18 @@ class ReturnCreateView(LoginRequiredMixin, CreateView):
     template_name = 'purchase.html'
     success_url = reverse_lazy('return')
 
-    # def form_valid(self, form):
-    #     object = form.save(commit=False)
-    #     purchase_id = self.kwargs.get('pk')
-    #     purchase = Purchase.objects.get(id=purchase_id)    ###доделать тайминг возврата- вывод сообщения###
+
+    def form_valid(self, form):
+        object = form.save(commit=False)
+        purchase_id = self.kwargs.get('pk')
+        purchase = Purchase.objects.get(id=purchase_id)
+        purchase_time_for_return = timezone.now() - purchase.created
+        if purchase_time_for_return.seconds > RETURN_TIME:
+            messages.error(self.request, "Your return time has expired")
+            return redirect('/purchase')
+        object.purchase = purchase
+        object.save()
+        return super().form_valid(form)
 
 
 class ReturnListView(LoginRequiredMixin, ListView):
@@ -157,7 +125,7 @@ class ReturnListView(LoginRequiredMixin, ListView):
     model = Return
     template_name = 'return_product.html'
     extra_context = {'form': ReturnCreateForm}
-    paginate_by = 4
+    # paginate_by = 1
 
     def get_queryset(self):
         if not self.request.user.is_superuser:
@@ -167,19 +135,28 @@ class ReturnListView(LoginRequiredMixin, ListView):
         return queryset
 
 
-class DeletePurchaseView(LoginRequiredMixin, DeleteView):
+class PurchaseDeleteView(LoginRequiredMixin, DeleteView):
     model = Purchase
     success_url = reverse_lazy('return')
 
     def form_valid(self, form):
+        # purchase = get_object_or_404(Purchase, returnpurchase='pk')
         purchase = self.get_object()
         user = purchase.user
         product = purchase.product
-        user.wallet += purchase.purchase_total
+        user.wallet += purchase.purchase_total()
         product.quantity += purchase.quantity
+        with transaction.atomic():
+            user.save()
+            product.save()
+            purchase.delete()
         return HttpResponseRedirect(self.success_url)
 
 
-class DeleteReturnView(LoginRequiredMixin, DeleteView):
+class ReturnDeleteView(LoginRequiredMixin, DeleteView):
     model = Return
+    # success_url = '/'
     success_url = reverse_lazy('return')
+
+
+
