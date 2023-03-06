@@ -20,6 +20,7 @@ class Product(models.Model):
     quantity = models.PositiveIntegerField()
 
     class Meta:
+
         verbose_name = 'Product'
         verbose_name_plural = 'Products'
         ordering = ['name']
