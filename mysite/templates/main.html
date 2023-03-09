@@ -33,13 +33,13 @@
             <li><a href="{% url 'signup' %}" class="nav-item">Sign Up</a></li>
         {% else %}
             {% if user.is_superuser %}
-{#                <li><a href="{% url 'home' %}" class="nav-item">Back to Main page.</a></li>#}
+                <li><a href="{% url 'home' %}" class="nav-item">Back to Main page.</a></li>
                 <li><a href="{% url 'new_product' %}" class="nav-item">Add New Product</a></li>
                 <li><a href="{% url 'purchase' %}" class="nav-item">Purchases</a></li>
                 <li><a href="{% url 'return' %}" class="nav-item">Returns</a></li>
                 <li><a href="{% url 'logout' %}" class="nav-item">Logout</a></li>
             {% else %}
-{#                <li><a href="{% url 'home' %}" class="nav-item">Back to Main page.</a></li>#}
+                <li><a href="{% url 'home' %}" class="nav-item">Back to Main page.</a></li>
                 <li><a href="{% url 'purchase' %}" class="nav-item">Purchase</a></li>
                 <li><a href="{% url 'return' %}" class="nav-item">Return</a></li>
                 <li><a href="{% url 'logout' %}" class="nav-item">Logout</a></li>

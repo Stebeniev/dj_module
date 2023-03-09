@@ -61,6 +61,7 @@ class PurchaseListView(LoginRequiredMixin, ListView):
     model = Purchase
     template_name = 'purchase.html'
     extra_context = {'form': ReturnCreateForm}
+    paginate_by = 5
 
 
     def get_queryset(self):
@@ -125,7 +126,7 @@ class ReturnListView(LoginRequiredMixin, ListView):
     model = Return
     template_name = 'return_product.html'
     extra_context = {'form': ReturnCreateForm}
-    # paginate_by = 1
+    paginate_by = 5
 
     def get_queryset(self):
         if not self.request.user.is_superuser:

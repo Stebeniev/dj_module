@@ -1,11 +1,12 @@
 {% extends 'main.html' %}
 {% block content %}
-    {% load static %}
-    <h2>Login, please.</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" style="color: blue; width: 120px" value="Login">
-    </form>
-
+    {#    {% load static %}#}
+    <div class="container2">
+        <h2>Login, please.</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" value="Login">Login</button>
+        </form>
+    </div>
 {% endblock %}
