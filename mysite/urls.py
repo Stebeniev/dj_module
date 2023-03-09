@@ -1,5 +1,4 @@
-from django.urls import path
-
+from django.urls import path, include
 
 from mysite.views import ProductView, Register, Login, Logout, ProductCreateView, ProductUpdateView,   \
     PurchaseCreateView, PurchaseListView, ReturnListView, ReturnCreateView, PurchaseDeleteView, ReturnDeleteView
@@ -19,4 +18,6 @@ urlpatterns = [
     path('return/product/<int:pk>', ReturnCreateView.as_view(), name='return_product'),
     path('return/delete/<int:pk>/', PurchaseDeleteView.as_view(), name='delete_return'),
     path('delete/<int:pk>/', ReturnDeleteView.as_view(), name='delete'),
+
+    # path('api/', include('mysite.api.urls'))
 ]

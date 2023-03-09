@@ -1,6 +1,5 @@
 from rest_framework import serializers
-from mysite.models import Product, Purchase, MyUser
-
+from mysite.models import Product, Purchase, MyUser, Return
 
 
 class MyUserSerializer(serializers.ModelSerializer):
@@ -39,6 +38,11 @@ class PurchaseSerializer(serializers.ModelSerializer):
         read_only_fields = ['user']
 
 
+class ReturnSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Return
+        fields = ['id', 'purchase', 'created']
 
 
 
