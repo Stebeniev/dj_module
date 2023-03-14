@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css.css' %}">
+    <style>
+        body {
+            color: black;
+            text-align: left;
+            background: gray;
+        }
+    </style>
+    <title></title>
+</head>
+<body>
+
+{% if messages %}
+    {% for message in messages %}
+        {% if message.tags == 'error' %}
+            <h2>
+                <p class="message" style="color: white"><span>Error: {{ message }}</span></p>
+            </h2>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+<header>
+    <nav class="navbar container1">
+        {% if not user.is_authenticated %}
+            <li><a href="{% url 'home' %}" class="nav-item">Back to Main page</a></li>
+            <li><a href="{% url 'login' %}" class="nav-item">Login</a></li>
+            <li><a href="{% url 'signup' %}" class="nav-item">Sign Up</a></li>
+        {% else %}
+            {% if user.is_superuser %}
+                <li><a href="{% url 'home' %}" class="nav-item">Back to Main page.</a></li>
+                <li><a href="{% url 'new_product' %}" class="nav-item">Add New Product</a></li>
+                <li><a href="{% url 'purchase' %}" class="nav-item">Purchases</a></li>
+                <li><a href="{% url 'return' %}" class="nav-item">Returns</a></li>
+                <li><a href="{% url 'logout' %}" class="nav-item">Logout</a></li>
+            {% else %}
+                <li><a href="{% url 'home' %}" class="nav-item">Back to Main page.</a></li>
+                <li><a href="{% url 'purchase' %}" class="nav-item">Purchase</a></li>
+                <li><a href="{% url 'return' %}" class="nav-item">Return</a></li>
+                <li><a href="{% url 'logout' %}" class="nav-item">Logout</a></li>
+                <div class="user-info">
+                    Nickname: {{ user.get_username }}
+                    <br>
+                    Wallet: {{ user.wallet }}
+                </div>
+            {% endif %}
+        {% endif %}
+    </nav>
+</header>
+</body>
+{% block content %}
+{% endblock %}
+</html>

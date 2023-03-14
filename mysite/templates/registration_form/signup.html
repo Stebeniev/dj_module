@@ -1,0 +1,12 @@
+{% extends 'home.html' %}
+{% block content %}
+    {#    {% load static %}#}
+    <div class="container2">
+        <h2>Create your account.</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" value="Sign Up">Sign Up</button>
+        </form>
+    </div>
+{% endblock %}

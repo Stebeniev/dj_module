@@ -4,7 +4,7 @@ from django.utils import timezone
 
 
 class MyUser(AbstractUser):
-    wallet = models.IntegerField(blank=True, null=True, verbose_name='wallet')
+    wallet = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
 
     class Meta:
         verbose_name = 'MyUser'
@@ -16,13 +16,14 @@ class Product(models.Model):
     name = models.CharField(max_length=100, db_index=True)
     description = models.TextField(blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    image = models.ImageField(blank=True)
+    image = models.ImageField(upload_to='images', blank=True, null=True)
     quantity = models.PositiveIntegerField()
 
     class Meta:
+
         verbose_name = 'Product'
         verbose_name_plural = 'Products'
-        ordering = ('name',)
+        ordering = ['name']
 
 
     def __str__(self):
@@ -30,35 +31,30 @@ class Product(models.Model):
 
 
 class Purchase(models.Model):
-    user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(MyUser, related_name='purchases', on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
-    created = models.DateTimeField(default=timezone.now)
+    created = models.DateTimeField(auto_now_add=True)
 
 
     class Meta:
         verbose_name = 'Purchase'
         verbose_name_plural = 'Purchases'
-        ordering = ('created', )
+        ordering = ['-created']
 
     def __str__(self):
-        return f'{self.product} | {self.quantity}'
+        return f"{self.product}"
+
+    def purchase_total(self):
+        return self.product.price * self.quantity
 
 
 class Return(models.Model):
-    delete = models.OneToOneField(Purchase, on_delete=models.CASCADE)
-    created = models.DateTimeField(default=timezone.now)
+    purchase = models.OneToOneField(Purchase, on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        verbose_name = 'Return'
-        verbose_name_plural = 'Returns'
-
+        ordering = ['-created']
 
     def __str__(self):
-        return f'{self.delete}'
-
-
-
-
-
-
+        return f'{self.purchase}'

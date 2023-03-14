@@ -1,0 +1,25 @@
+{% extends 'main.html' %}
+{% block content %}
+    <div class="return">
+        <h1>Return product</h1>
+        {% for return in object_list %}
+            <li>Product: {{ return.purchase.product.name }}</li>
+            <li>Product ID: {{ return.purchase.product.id }}</li>
+            <li>Quantity: {{ return.purchase.quantity }}</li>
+            <li>Username: {{ return.purchase.user }}</li>
+            <li>Created: {{ return.purchase.created }}</li>
+            <li>Total: {{ return.purchase.purchase_total }}</li>
+            {% if user.is_superuser %}
+                <form method="post" action="{% url 'delete_return' return.purchase_id %}">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" style="color: blue; width: 120px">Confirm return</button>
+                </form>
+                <form method="post" action="{% url 'delete' return.id %}">
+                    {% csrf_token %}
+                    <button type="submit" style="color: red; width: 120px">Reject return</button>
+                </form>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endblock %}

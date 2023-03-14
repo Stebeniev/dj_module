@@ -1,0 +1,59 @@
+{% extends 'main.html' %}
+{% block content %}
+    {% for product in object_list %}
+        <div class="container">
+            <h3><b>Product: {{ product.name }}</b></h3>
+            <div class="image">
+                <img src="media/{{ product.image }}"
+                     style="width: 220px; height: 220px" alt="product_img">
+            </div>
+            <p>Description: {{ product.description|linebreaksbr }}</p>
+            {% if product.quantity %}
+                <ul>
+                    <li>Price: {{ product.price }}</li>
+                    <li>In stock: {{ product.quantity }}</li>
+                </ul>
+            {% else %}
+                <div class="info" style="color: red;">
+                    <h2><b>Product out of stock</b></h2>
+                </div>
+            {% endif %}
+            {% if user.is_authenticated %}
+                {% if  not user.is_superuser %}
+                    <form action="{% url 'purchase_create' product.id %}" method="post">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <label>
+                            Enter quantity: <input type="number" name="quantity" value="1"
+                                                   min="1">
+                        </label>
+                        <br>
+                        <br>
+                        <button type="submit" style="color: blue; width: 120px">
+                            <span>Buy Now</span></button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'update_product' product.id %}">Update product</a>
+                {% endif %}
+            {% endif %}
+        </div>
+    {% endfor %}
+    <br>
+    <div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo;first page &raquo</a>
+            <a href="?page={{ page_obj.previous_page_number }}">&laquo;previous page &raquo</a>
+        {% endif %}
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.paginator.num_pages }}">&laquo;last page &raquo</a>
+            <a href="?page={{ page_obj.next_page_number }}">&laquo;next page &raquo</a>
+
+        {% endif %}
+    </span>
+    </div>
+{% endblock %}
